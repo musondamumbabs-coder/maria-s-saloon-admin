@@ -25,8 +25,11 @@
         .btn { background: var(--primary); color: white; border: none; padding: 14px; width: 100%; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background 0.2s; }
         .btn:hover { background: #be185d; }
         .alert { background: #dcfce7; color: #15803d; padding: 15px; border-radius: 6px; margin-bottom: 20px; font-weight: 500; display: none; }
+        
+        /* Quick Actions Reply Button Interface Layout Styles */
+        .reply-btn { background: var(--dark); color: white; border: none; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; cursor: pointer; margin-top: 10px; display: inline-flex; align-items: center; gap: 6px; text-decoration: none; width: fit-content; transition: background 0.2s; }
+        .reply-btn:hover { background: #1e293b; }
     </style>
-    <!-- EmailJS External Library Node -->
     <script type="module" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </head>
 <body>
@@ -40,7 +43,6 @@
 
         <div class="grid">
             
-            <!-- Left Panel: Campaign Engine -->
             <div class="card">
                 <h3 style="color: var(--dark); border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; margin-bottom: 10px;">📣 Marketing Controls</h3>
                 
@@ -66,7 +68,6 @@
                 <button class="btn" onclick="handlePublish()">🚀 Push Updates Live</button>
             </div>
 
-            <!-- Right Panel: Database Bookings Stream -->
             <div class="card">
                 <h3 style="color: var(--dark); border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; margin-bottom: 10px;">📅 Incoming Email Bookings</h3>
                 <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 15px;">Clients listed below submitted scheduling data and requested manual verification via email.</p>
@@ -94,6 +95,10 @@
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
+
+        // Sound System Initialization Variables
+        const chime = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-600.wav');
+        let initialLoadDone = false;
 
         // Pre-designed template bank text options
         const templates = {
@@ -180,21 +185,38 @@
             
             const data = snapshot.val();
             if (data) {
+                // Sound notification engine - rings only on brand new entries after startup loading
+                if (initialLoadDone) {
+                    chime.play().catch(err => console.log("Audio play delayed till interaction: ", err));
+                }
+
                 // Loop backward using JavaScript reverse to display newly submitted entries first
                 Object.keys(data).reverse().forEach((key) => {
                     const booking = data[key];
                     const bookingCard = document.createElement('div');
-                    bookingCard.style.cssText = "background: #f8fafc; border-left: 4px solid #db2777; padding: 14px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 4px;";
+                    bookingCard.style.cssText = "background: #f8fafc; border-left: 4px solid #db2777; padding: 14px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 4px; display: flex; flex-direction: column;";
                     
+                    // Define parameters for a highly structured warm email introduction body line map response template
+                    const subjectLine = encodeURIComponent(`Booking Request Received! - Maria's Hair Saloon`);
+                    const bodyLayout = encodeURIComponent(`Hello ${booking.customerName},\n\nThank you for choosing Maria's Hair Saloon! I received your website booking request for ${booking.hairstyle} on ${booking.appointmentTime}.\n\nYour slot is tentatively saved! I am ready to give you a clean, neat look. Please let me know if you have any style reference pictures you would like me to review before you arrive.\n\n`);
+
                     bookingCard.innerHTML = `
                         <strong style="color: #0f172a; font-size: 1.05rem; display:block; margin-bottom:4px;">${booking.customerName}</strong>
                         <span style="color: #db2777; font-weight: 600; font-size: 0.9rem; display:block; margin-bottom:2px;">💇‍♀️ ${booking.hairstyle}</span>
                         <span style="color: #64748b; font-size: 0.85rem; display:block;">📅 ${booking.appointmentTime}</span>
+                        ${booking.customerEmail ? `
+                            <span style="color: #475569; font-size: 0.85rem; display:block; margin-top:4px; font-style: italic;">✉️ ${booking.customerEmail}</span>
+                            <a href="mailto:${booking.customerEmail}?subject=${subjectLine}&body=${bodyLayout}" class="reply-btn">
+                                📩 Reply to Confirmation
+                            </a>
+                        ` : ''}
                     `;
                     listContainer.appendChild(bookingCard);
                 });
+                initialLoadDone = true;
             } else {
                 listContainer.innerHTML = `<p style="color: #94a3b8; font-style: italic; text-align: center; margin-top: 20px;">No email bookings pending at the moment...</p>`;
+                initialLoadDone = true;
             }
         });
 
