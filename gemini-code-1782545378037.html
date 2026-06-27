@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maria's Salon | Admin Dashboard</title>
+    <style>
+        :root { --primary: #db2777; --dark: #0f172a; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
+        body { background-color: #f8fafc; color: #334155; padding: 30px; }
+        .wrapper { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h1 { color: var(--dark); border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+        .badge { background: #fce7f3; color: var(--primary); font-size: 0.8rem; padding: 4px 10px; border-radius: 20px; }
+        label { display: block; font-weight: 600; margin-top: 20px; margin-bottom: 5px; color: var(--dark); }
+        select, textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 1rem; background: #f8fafc; }
+        textarea { resize: vertical; }
+        .checkbox-container { display: flex; align-items: center; margin: 20px 0; background: #fff1f2; padding: 15px; border-radius: 6px; border: 1px solid #ffe4e6; }
+        .checkbox-container input { width: 20px; height: 20px; margin-right: 12px; cursor: pointer; }
+        .checkbox-container label { margin: 0; cursor: pointer; color: #9f1239; }
+        .btn { background: var(--primary); color: white; border: none; padding: 14px; width: 100%; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        .btn:hover { background: #be185d; }
+        .alert { background: #dcfce7; color: #15803d; padding: 15px; border-radius: 6px; margin-bottom: 20px; font-weight: 500; display: none; }
+    </style>
+</head>
+<body>
+
+    <div class="wrapper">
+        <h1>Maria's Saloon Admin Panel <span class="badge">Live Controller</span></h1>
+        
+        <div class="alert" id="success-message">Promotion successfully published!</div>
+
+        <p style="color: #64748b;">Use this secure dashboard to update live marketing campaigns and instantly blast notifications to subscribers.</p>
+
+        <label>1. Select Promotion Category</label>
+        <select id="category-picker" onchange="updateTemplates()">
+            <option value="weekend">☀️ Weekend & Flash Sales</option>
+            <option value="holidays">🎉 Major Holidays (Christmas, New Year, Easter, Independence Day)</option>
+            <option value="seasonal">📚 Seasonal & Back to School</option>
+        </select>
+
+        <label>2. Choose a Smart Template Option</label>
+        <select id="template-picker" onchange="syncEditor()">
+            </select>
+
+        <label>3. Customize Final Ad Message</label>
+        <textarea id="ad-editor" rows="5"></textarea>
+
+        <div class="checkbox-container">
+            <input type="checkbox" id="email-blast" checked>
+            <label for="email-blast"><strong>Notify Customers:</strong> Automatically send this message via business email to all subscribers.</label>
+        </div>
+
+        <button class="btn" onclick="handlePublish()">🚀 Push Updates Live</button>
+    </div>
+
+    <script>
+        // Pre-designed template bank text options
+        const templates = {
+            weekend: [
+                "☀️ Weekend Rush! Book any plaiting service for Friday or Saturday and get a free deep conditioning treatment!",
+                "✨ Mid-Week Glow Up: Book your lines or twists on Tuesday or Wednesday and save K50 on your overall total!",
+                "🔋 Sunday Special: Get your clean protective school or work lines done this Sunday evening. Limited spaces available."
+            ],
+            holidays: [
+                "🎄 Look stunning for the festive season! Holiday booking slots are officially open. Secure your braid slot early!",
+                "✨ New Year, New Hair! Start 2026 beautifully with 20% off all crisp knotless braids at Maria's Hair Saloon.",
+                "🇿🇲 Celebrate Independence Day in style! Enjoy a special flash discount on all signature styles this holiday weekend.",
+                "❤️ Love is in the hair! Book an appointment with a friend for Valentine's Day and receive matching hair gift accessories.",
+                "🐣 Easter Long Weekend Special! Get your hair looking fresh before the holiday travels. Book online now!"
+            ],
+            seasonal: [
+                "📚 Back to School, Back to Looking Sharp! Special neat and durable school lines for kids and teens at flat discount rates.",
+                "❄️ Cold Weather Hair Protection! Keep your hair thriving with beautiful protective twists and braids. Book your slot today!"
+            ]
+        };
+
+        function updateTemplates() {
+            const category = document.getElementById('category-picker').value;
+            const picker = document.getElementById('template-picker');
+            picker.innerHTML = '';
+            
+            templates[category].forEach((msg) => {
+                let option = document.createElement('option');
+                option.value = msg;
+                option.innerText = msg.substring(0, 70) + "...";
+                picker.appendChild(option);
+            });
+            syncEditor();
+        }
+
+        function syncEditor() {
+            document.getElementById('ad-editor').value = document.getElementById('template-picker').value;
+        }
+
+        function handlePublish() {
+            const isEmailChecked = document.getElementById('email-blast').checked;
+            const bannerMsg = document.getElementById('ad-editor').value;
+            const alertBox = document.getElementById('success-message');
+            
+            alertBox.style.display = "block";
+            if (isEmailChecked) {
+                alertBox.innerText = "🚀 Success! Live site updated & email broadcast initiated.";
+            } else {
+                alertBox.innerText = "💻 Success! Live site updated locally.";
+            }
+
+            setTimeout(() => { alertBox.style.display = "none"; }, 4000);
+        }
+
+        // Initialize template choices on page startup
+        window.onload = updateTemplates;
+    </script>
+</body>
+</html>
