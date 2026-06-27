@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel — Maria's Salon CMS</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --rose:      #db2777;
+            --rose-deep: #be185d;
+            --rose-pale: #fdf2f8;
+            --indigo:    #1e1b4b;
+            --indigo-md: #312e81;
+            --slate-50:  #f8fafc;
+            --slate-100: #f1f5f9;
+            --slate-200: #e2e8f0;
+            --slate-400: #94a3b8;
+            --slate-600: #475569;
+            --slate-800: #1e293b;
+            --white:     #ffffff;
+            --success:   #16a34a;
+            --danger:    #ef4444;
+            --sidebar-w: 240px;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,.06);
+            --shadow-md: 0 4px 16px rgba(0,0,0,.08);
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Inter', sans-serif; background: var(--slate-100); color: var(--slate-800); display: flex; min-height: 100vh; }
+
+        /* ─── SIDEBAR ─────────────────────────────────── */
+        .sidebar {
+            width: var(--sidebar-w); background: var(--indigo); position: fixed;
+            top: 0; left: 0; bottom: 0; display: flex; flex-direction: column;
+            z-index: 50; overflow-y: auto;
+        }
+        .sidebar-brand { padding: 28px 20px 20px; border-bottom: 1px solid rgba(255,255,255,.08); }
+        .sidebar-brand-title { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: #fbcfe8; line-height: 1.3; }
+        .sidebar-brand-sub { font-size: 0.7rem; color: #64748b; margin-top: 3px; letter-spacing: 1px; text-transform: uppercase; }
+        .live-dot { display: inline-flex; align-items: center; gap: 6px; font-size: 0.7rem; background: rgba(22,163,74,.15); color: #4ade80; padding: 4px 10px; border-radius: 50px; margin-top: 10px; }
+        .live-dot::before { content: ''; width: 6px; height: 6px; background: #4ade80; border-radius: 50%; animation: blink 2s infinite; }
+        @keyframes blink { 0%,100%{opacity:1} 50%{opacity:.3} }
+        .sidebar-nav { padding: 16px 12px; flex: 1; display: flex; flex-direction: column; gap: 4px; }
+        .sidebar-nav a {
+            display: flex; align-items: center; gap: 10px; padding: 10px 12px;
+            border-radius: var(--radius-sm); text-decoration: none;
+            font-size: 0.85rem; font-weight: 500; color: #94a3b8;
+            transition: background .2s, color .2s;
+        }
+        .sidebar-nav a:hover, .sidebar-nav a.active { background: rgba(255,255,255,.08); color: white; }
+        .sidebar-nav a.active { border-left: 3px solid var(--rose); padding-left: 9px; color: #fbcfe8; }
+        .sidebar-nav-label { font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1.5px; color: #475569; padding: 14px 12px 6px; font-weight: 600; }
+        .sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(255,255,255,.08); font-size: 0.7rem; color: #475569; }
+
+        /* ─── MAIN CONTENT ────────────────────────────── */
+        .main-content { margin-left: var(--sidebar-w); flex: 1; }
+
+        .topbar {
+            background: white; border-bottom: 1px solid var(--slate-200);
+            padding: 0 32px; height: 60px; display: flex; align-items: center;
+            justify-content: space-between; position: sticky; top: 0; z-index: 40;
+            box-shadow: var(--shadow-sm);
+        }
+        .topbar-title { font-size: 1rem; font-weight: 600; color: var(--slate-800); }
+        .topbar-title span { color: var(--slate-400); font-weight: 400; }
+        .topbar-actions { display: flex; align-items: center; gap: 12px; }
+
+        /* ─── SECTIONS ────────────────────────────────── */
+        .content-section { padding: 32px; }
+        .section-title { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--indigo); margin-bottom: 4px; }
+        .section-sub { font-size: 0.8rem; color: var(--slate-400); margin-bottom: 24px; }
+
+        /* ─── CARDS ───────────────────────────────────── */
+        .card { background: white; border-radius: var(--radius-md); border: 1px solid var(--slate-200); box-shadow: var(--shadow-sm); overflow: hidden; }
+        .card-header { padding: 18px 22px; border-bottom: 1px solid var(--slate-200); display: flex; justify-content: space-between; align-items: center; }
+        .card-header h4 { font-size: 0.9rem; font-weight: 600; color: var(--slate-800); }
+        .card-header .card-header-sub { font-size: 0.75rem; color: var(--slate-400); }
+        .card-body { padding: 22px; }
+        .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; }
+        .three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+        @media(max-width: 1100px) { .two-col { grid-template-columns: 1fr; } }
+
+        /* ─── FORM ELEMENTS ───────────────────────────── */
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; font-size: 0.75rem; font-weight: 600; color: var(--slate-600); margin-bottom: 5px; text-transform: uppercase; letter-spacing: .5px; }
+        .form-control { width: 100%; padding: 9px 12px; border: 1.5px solid var(--slate-200); border-radius: var(--radius-sm); font-family: 'Inter', sans-serif; font-size: 0.9rem; color: var(--slate-800); background: var(--slate-50); transition: border-color .2s, box-shadow .2s; }
+        .form-control:focus { outline: none; border-color: var(--rose); box-shadow: 0 0 0 3px rgba(219,39,119,.1); background: white; }
+        .form-control::placeholder { color: var(--slate-400); }
+        textarea.form-control { resize: vertical; min-height: 80px; }
+        .checkbox-row { display: flex; align-items: center; gap: 8px; padding: 10px 12px; background: var(--rose-pale); border: 1px dashed #fce7f3; border-radius: var(--radius-sm); margin-bottom: 16px; cursor: pointer; }
+        .checkbox-row input { cursor: pointer; width: 16px; height: 16px; accent-color: var(--rose); }
+        .checkbox-row label { margin: 0; font-size: 0.8rem; font-weight: 600; color: var(--rose-deep); cursor: pointer; text-transform: none; letter-spacing: 0; }
+
+        /* ─── BUTTONS ─────────────────────────────────── */
+        .btn { display: inline-flex; align-items: center; gap: 6px; border: none; border-radius: var(--radius-sm); font-family: 'Inter', sans-serif; font-weight: 600; cursor: pointer; transition: background .2s, transform .15s; }
+        .btn-sm { padding: 7px 14px; font-size: 0.8rem; }
+        .btn-md { padding: 10px 18px; font-size: 0.875rem; }
+        .btn-full { width: 100%; justify-content: center; padding: 11px; }
+        .btn-rose { background: var(--rose); color: white; }
+        .btn-rose:hover { background: var(--rose-deep); }
+        .btn-indigo { background: var(--indigo); color: white; }
+        .btn-indigo:hover { background: var(--indigo-md); }
+        .btn-danger { background: var(--danger); color: white; }
+        .btn-danger:hover { background: #dc2626; }
+        .btn-success { background: var(--success); color: white; }
+        .btn-success:hover { background: #15803d; }
+        .btn-ghost { background: var(--slate-50); color: var(--slate-600); border: 1.5px solid var(--slate-200); }
+        .btn-ghost:hover { background: var(--slate-100); }
+        .icon-btn { background: none; border: none; cursor: pointer; width: 30px; height: 30px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 0.85rem; transition: background .2s; }
+        .icon-btn.delete { color: var(--danger); }
+        .icon-btn.delete:hover { background: #fee2e2; }
+
+        /* ─── STAT CARDS ──────────────────────────────── */
+        .stat-card { padding: 20px; }
+        .stat-card .stat-label { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; color: var(--slate-400); font-weight: 600; }
+        .stat-card .stat-value { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--indigo); line-height: 1.2; margin-top: 4px; }
+        .stat-card .stat-change { font-size: 0.75rem; color: var(--slate-400); margin-top: 4px; }
+        .stat-card .stat-icon { font-size: 1.4rem; margin-bottom: 8px; }
+
+        /* ─── DATA LIST ───────────────────────────────── */
+        .data-list { border: 1px solid var(--slate-200); border-radius: var(--radius-sm); overflow: hidden; max-height: 340px; overflow-y: auto; }
+        .data-row { display: flex; justify-content: space-between; align-items: center; padding: 11px 14px; border-bottom: 1px solid var(--slate-200); background: white; transition: background .15s; }
+        .data-row:last-child { border-bottom: none; }
+        .data-row:hover { background: var(--slate-50); }
+        .data-row-info h6 { font-weight: 600; font-size: 0.85rem; color: var(--slate-800); }
+        .data-row-info p { font-size: 0.75rem; color: var(--slate-400); margin-top: 2px; }
+        .empty-state { padding: 32px; text-align: center; color: var(--slate-400); font-size: 0.85rem; }
+        .empty-state .empty-icon { font-size: 1.8rem; margin-bottom: 8px; }
+
+        /* ─── TABLE ───────────────────────────────────── */
+        .table-wrapper { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        thead th { background: var(--slate-50); color: var(--slate-600); padding: 11px 14px; border-bottom: 2px solid var(--slate-200); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: .5px; white-space: nowrap; }
+        tbody td { padding: 13px 14px; border-bottom: 1px solid var(--slate-200); vertical-align: top; }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover td { background: var(--slate-50); }
+        .badge { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 50px; font-size: 0.72rem; font-weight: 600; }
+        .badge-green  { background: #dcfce7; color: #15803d; }
+        .badge-yellow { background: #fef9c3; color: #a16207; animation: pulse 2s infinite; }
+        .badge-slate  { background: var(--slate-100); color: var(--slate-600); }
+        .badge-rose   { background: #fce7f3; color: var(--rose-deep); }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:.65} }
+        .name-cell strong { display: block; }
+        .name-cell small { color: var(--slate-400); font-size: 0.75rem; }
+        .price-cell { color: var(--rose); font-weight: 700; font-family: 'Playfair Display', serif; }
+        .slot-code { background: var(--slate-100); padding: 2px 7px; border-radius: 4px; font-size: 0.75rem; font-family: monospace; color: var(--slate-600); }
+        .specs-cell { max-width: 200px; font-size: 0.78rem; color: var(--slate-600); background: var(--slate-50); padding: 6px 8px; border-radius: 4px; word-wrap: break-word; }
+
+        /* ─── LOYALTY ─────────────────────────────────── */
+        .streak-bar-wrap { display: flex; align-items: center; gap: 10px; }
+        .streak-bar { flex: 1; height: 6px; background: var(--slate-200); border-radius: 50px; overflow: hidden; }
+        .streak-bar-fill { height: 100%; background: var(--rose); border-radius: 50px; transition: width .5s ease; }
+        .streak-num { font-weight: 700; color: var(--rose); font-size: 0.85rem; min-width: 24px; }
+
+        /* ─── TOAST ───────────────────────────────────── */
+        #toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 999; display: flex; flex-direction: column; gap: 8px; }
+        .toast { background: white; border-radius: var(--radius-md); padding: 12px 18px; box-shadow: 0 8px 24px rgba(0,0,0,.12); border-left: 4px solid var(--rose); font-size: 0.85rem; color: var(--slate-800); display: flex; align-items: center; gap: 10px; animation: slideIn .3s ease; max-width: 300px; }
+        .toast.success { border-left-color: var(--success); }
+        .toast.error   { border-left-color: var(--danger); }
+        @keyframes slideIn  { from{transform:translateX(110%);opacity:0} to{transform:translateX(0);opacity:1} }
+        @keyframes slideOut { from{transform:translateX(0);opacity:1} to{transform:translateX(110%);opacity:0} }
+
+        /* ─── MODAL ───────────────────────────────────── */
+        .modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;pointer-events:none;transition:opacity .25s; }
+        .modal-overlay.open { opacity:1;pointer-events:all; }
+        .modal { background:white;border-radius:var(--radius-md);padding:28px;max-width:420px;width:100%;transform:scale(.96);transition:transform .25s; }
+        .modal-overlay.open .modal { transform:scale(1); }
+        .modal h4 { font-size:1rem;font-weight:600;color:var(--slate-800);margin-bottom:6px; }
+        .modal p  { font-size:0.85rem;color:var(--slate-600);margin-bottom:20px; }
+        .modal-actions { display:flex;gap:10px;justify-content:flex-end; }
+
+        @media(max-width: 768px) {
+            .sidebar { transform: translateX(-100%); transition: transform .3s; }
+            .sidebar.open { transform: translateX(0); }
+            .main-content { margin-left: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <div class="sidebar-brand-title">Maria's Salon<br>CMS</div>
+            <div class="sidebar-brand-sub">Admin Panel</div>
+            <div class="live-dot">Live Sync Active</div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="sidebar-nav-label">Overview</div>
+            <a href="#section-overview" class="active">📊 Dashboard</a>
+            <div class="sidebar-nav-label">Content</div>
+            <a href="#section-hero">🖼️ Hero Banner</a>
+            <a href="#section-catalog">✂️ Style Catalog</a>
+            <a href="#section-gallery">🖼️ Gallery</a>
+            <div class="sidebar-nav-label">Clients</div>
+            <a href="#section-bookings">📋 Bookings</a>
+            <a href="#section-loyalty">👑 Loyalty Hub</a>
+        </nav>
+        <div class="sidebar-footer">Maria's Salon · Admin v2.0</div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <div class="topbar-title">Dashboard <span>/ Overview</span></div>
+            <div class="topbar-actions">
+                <span id="topbar-date" style="font-size:0.8rem; color:var(--slate-400);"></span>
+            </div>
+        </div>
+
+        <!-- ── OVERVIEW STATS ── -->
+        <div class="content-section" id="section-overview">
+            <div class="section-title">Dashboard Overview</div>
+            <div class="section-sub">Live data from Firebase — refreshes automatically.</div>
+            <div class="three-col">
+                <div class="card">
+                    <div class="stat-card">
+                        <div class="stat-icon">📋</div>
+                        <div class="stat-label">Total Bookings</div>
+                        <div class="stat-value" id="stat-bookings">—</div>
+                        <div class="stat-change">All time</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="stat-card">
+                        <div class="stat-icon">✂️</div>
+                        <div class="stat-label">Styles Published</div>
+                        <div class="stat-value" id="stat-styles">—</div>
+                        <div class="stat-change">In catalog</div>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="stat-card">
+                        <div class="stat-icon">🖼️</div>
+                        <div class="stat-label">Gallery Images</div>
+                        <div class="stat-value" id="stat-gallery">—</div>
+                        <div class="stat-change">Portfolio assets</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── LOYALTY HUB ── -->
+        <div class="content-section" id="section-loyalty">
+            <div class="section-title">👑 Client Loyalty Hub</div>
+            <div class="section-sub">Ranks clients by consecutive monthly bookings. A 5-month streak in the top 2 earns a 30% discount award.</div>
+            <div class="card">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Client Email</th>
+                                <th>Streak Progress</th>
+                                <th>Total Bookings</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="loyalty-table">
+                            <tr><td colspan="6" class="empty-state">Loading loyalty data…</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── HERO BANNER ── -->
+        <div class="content-section" id="section-hero">
+            <div class="section-title">🖼️ Homepage Hero Banner</div>
+            <div class="section-sub">Changes here go live on the customer website immediately.</div>
+            <div class="card">
+                <div class="card-body">
+                    <div class="form-group">
+                        <label>Main Headline</label>
+                        <input class="form-control" type="text" id="hero-headline" placeholder="e.g., Flawless Plaits, Every Time">
+                    </div>
+                    <div class="form-group">
+                        <label>Subtext / Promotion</label>
+                        <textarea class="form-control" id="hero-subtext" placeholder="e.g., Special holiday discount — book now and save K50!"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Cover Image URL</label>
+                        <input class="form-control" type="url" id="hero-image" placeholder="Paste an Unsplash or direct image URL">
+                    </div>
+                    <button class="btn btn-rose btn-md" onclick="updateHero()">Save & Push Live →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── STYLE CATALOG ── -->
+        <div class="content-section" id="section-catalog">
+            <div class="section-title">✂️ Style Catalog & Pricing</div>
+            <div class="section-sub">Add new styles to the customer lookbook and configure pricing by length.</div>
+            <div class="two-col">
+                <div class="card">
+                    <div class="card-header"><h4>Add New Style</h4></div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Style Name</label>
+                            <input class="form-control" type="text" id="s-name" placeholder="e.g., Goddess Knotless Braids">
+                        </div>
+                        <div class="form-group">
+                            <label>Lookbook Image URL</label>
+                            <input class="form-control" type="url" id="s-image" placeholder="Paste image link">
+                        </div>
+                        <div class="checkbox-row">
+                            <input type="checkbox" id="s-short-only" onchange="toggleLengthInputs(this.checked)">
+                            <label for="s-short-only">Short length only (fixed price)</label>
+                        </div>
+                        <div class="form-group">
+                            <label>Short Length Price (K)</label>
+                            <input class="form-control" type="number" id="s-price-short" placeholder="e.g., 200">
+                        </div>
+                        <div id="extended-prices">
+                            <div class="form-group">
+                                <label>Medium Length Price (K)</label>
+                                <input class="form-control" type="number" id="s-price-medium" placeholder="e.g., 270">
+                            </div>
+                            <div class="form-group">
+                                <label>Long Length Price (K)</label>
+                                <input class="form-control" type="number" id="s-price-long" placeholder="e.g., 340">
+                            </div>
+                        </div>
+                        <button class="btn btn-rose btn-full" onclick="addStyle()">Publish to Catalog →</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Live Catalog</h4>
+                        <span class="card-header-sub" id="styles-count">0 styles</span>
+                    </div>
+                    <div id="styles-list" class="data-list">
+                        <div class="empty-state"><div class="empty-icon">✂️</div>No styles yet.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── GALLERY ── -->
+        <div class="content-section" id="section-gallery">
+            <div class="section-title">🖼️ Portfolio Gallery</div>
+            <div class="section-sub">Images added here appear in the customer-facing gallery instantly.</div>
+            <div class="two-col">
+                <div class="card">
+                    <div class="card-header"><h4>Add Image</h4></div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label>Image URL</label>
+                            <input class="form-control" type="url" id="g-url" placeholder="https://images.unsplash.com/…">
+                        </div>
+                        <button class="btn btn-indigo btn-md" onclick="addGalleryImage()">Add to Gallery →</button>
+                    </div>
+                </div>
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Gallery Assets</h4>
+                        <span class="card-header-sub" id="gallery-count">0 images</span>
+                    </div>
+                    <div id="gallery-list" class="data-list">
+                        <div class="empty-state"><div class="empty-icon">🖼️</div>No images yet.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ── BOOKINGS ── -->
+        <div class="content-section" id="section-bookings">
+            <div class="section-title">📋 Booking Pipeline</div>
+            <div class="section-sub">All incoming client reservations, newest first. Max 3 clients per day.</div>
+            <div class="card">
+                <div class="card-header">
+                    <h4>All Appointments</h4>
+                    <button class="btn btn-danger btn-sm" onclick="confirmClearAll()">⚠️ Clear All Bookings</button>
+                </div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Received</th>
+                                <th>Client</th>
+                                <th>Style</th>
+                                <th>Length</th>
+                                <th>Price</th>
+                                <th>Date & Slot</th>
+                                <th>Notes</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody id="bookings-table">
+                            <tr><td colspan="8" class="empty-state">No bookings yet.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- CONFIRM MODAL -->
+    <div class="modal-overlay" id="confirm-modal">
+        <div class="modal">
+            <h4 id="modal-title">Are you sure?</h4>
+            <p id="modal-msg">This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button class="btn btn-ghost btn-sm" onclick="closeModal()">Cancel</button>
+                <button class="btn btn-danger btn-sm" id="modal-confirm-btn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div id="toast-container"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue, set, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA0vagMFgcrETgAOL7qY3FyKpK5ZIoScck",
+            authDomain: "maria-s-hair-salon.firebaseapp.com",
+            databaseURL: "https://maria-s-hair-salon-default-rtdb.firebaseio.com"
+        };
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // ── DATE ───────────────────────────────────────
+        document.getElementById('topbar-date').textContent = new Date().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+        // ── TOAST ───────────────────────────────────────
+        function toast(msg, type = 'info') {
+            const icons = { success:'✅', error:'❌', info:'ℹ️' };
+            const el = document.createElement('div');
+            el.className = `toast ${type}`;
+            el.innerHTML = `<span>${icons[type]}</span>${msg}`;
+            document.getElementById('toast-container').appendChild(el);
+            setTimeout(() => { el.style.animation='slideOut .3s ease forwards'; setTimeout(()=>el.remove(),300); }, 3500);
+        }
+
+        // ── MODAL ───────────────────────────────────────
+        let pendingConfirm = null;
+        window.closeModal = () => document.getElementById('confirm-modal').classList.remove('open');
+        function showConfirm(title, msg, onConfirm, danger = true) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-msg').textContent = msg;
+            const btn = document.getElementById('modal-confirm-btn');
+            btn.textContent = danger ? 'Delete' : 'Confirm';
+            btn.className = `btn ${danger ? 'btn-danger' : 'btn-success'} btn-sm`;
+            pendingConfirm = onConfirm;
+            btn.onclick = () => { onConfirm(); closeModal(); };
+            document.getElementById('confirm-modal').classList.add('open');
+        }
+
+        // ── SIDEBAR ACTIVE STATE ────────────────────────
+        const sections = document.querySelectorAll('.content-section');
+        const navLinks = document.querySelectorAll('.sidebar-nav a');
+        const observer = new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (e.isIntersecting) {
+                    navLinks.forEach(a => a.classList.remove('active'));
+                    const match = document.querySelector(`.sidebar-nav a[href="#${e.target.id}"]`);
+                    if (match) match.classList.add('active');
+                }
+            });
+        }, { threshold: 0.3 });
+        sections.forEach(s => observer.observe(s));
+
+        // ── HERO ────────────────────────────────────────
+        onValue(ref(db, 'salon/heroConfig'), snap => {
+            const d = snap.val() || {};
+            document.getElementById('hero-headline').value = d.headline || '';
+            document.getElementById('hero-subtext').value = d.subtext || '';
+            document.getElementById('hero-image').value = d.imageUrl || '';
+        });
+
+        window.updateHero = function() {
+            const headline = document.getElementById('hero-headline').value.trim();
+            const subtext = document.getElementById('hero-subtext').value.trim();
+            const imageUrl = document.getElementById('hero-image').value.trim();
+            if (!headline || !subtext) { toast('Headline and subtext are required.', 'error'); return; }
+            set(ref(db, 'salon/heroConfig'), { headline, subtext, imageUrl })
+                .then(() => toast('Hero banner updated successfully!', 'success'))
+                .catch(() => toast('Failed to update. Check your connection.', 'error'));
+        };
+
+        // ── STYLES ──────────────────────────────────────
+        window.toggleLengthInputs = function(isShortOnly) {
+            document.getElementById('extended-prices').style.display = isShortOnly ? 'none' : 'block';
+        };
+
+        let styleCount = 0;
+        onValue(ref(db, 'salon/styles'), snap => {
+            const list = document.getElementById('styles-list');
+            list.innerHTML = '';
+            styleCount = 0;
+            if (!snap.exists()) {
+                list.innerHTML = '<div class="empty-state"><div class="empty-icon">✂️</div>No styles published yet.</div>';
+                document.getElementById('styles-count').textContent = '0 styles';
+                document.getElementById('stat-styles').textContent = '0';
+                return;
+            }
+            Object.entries(snap.val()).forEach(([id, item]) => {
+                styleCount++;
+                const row = document.createElement('div');
+                row.className = 'data-row';
+                const label = item.isShortOnly ? `K${item.priceShort} flat` : `S K${item.priceShort} · M K${item.priceMedium} · L K${item.priceLong}`;
+                row.innerHTML = `
+                    <div class="data-row-info"><h6>${item.name}</h6><p>${label}</p></div>
+                    <button class="icon-btn delete" title="Delete style" onclick="deleteStyle('${id}', '${item.name}')">🗑️</button>
+                `;
+                list.appendChild(row);
+            });
+            document.getElementById('styles-count').textContent = `${styleCount} style${styleCount !== 1 ? 's' : ''}`;
+            document.getElementById('stat-styles').textContent = styleCount;
+        });
+
+        window.addStyle = function() {
+            const name   = document.getElementById('s-name').value.trim();
+            const image  = document.getElementById('s-image').value.trim();
+            const isShortOnly = document.getElementById('s-short-only').checked;
+            const priceS = document.getElementById('s-price-short').value;
+            const priceM = isShortOnly ? '0' : document.getElementById('s-price-medium').value;
+            const priceL = isShortOnly ? '0' : document.getElementById('s-price-long').value;
+
+            if (!name || !priceS) { toast('Style name and short price are required.', 'error'); return; }
+            if (!isShortOnly && (!priceM || !priceL)) { toast('All length prices are required.', 'error'); return; }
+
+            push(ref(db, 'salon/styles'), { name, imageUrl: image, isShortOnly, priceShort: priceS, priceMedium: priceM, priceLong: priceL })
+                .then(() => {
+                    toast(`"${name}" published to catalog!`, 'success');
+                    ['s-name','s-image','s-price-short','s-price-medium','s-price-long'].forEach(id => document.getElementById(id).value = '');
+                    document.getElementById('s-short-only').checked = false;
+                    toggleLengthInputs(false);
+                }).catch(() => toast('Failed to add style.', 'error'));
+        };
+
+        window.deleteStyle = function(id, name) {
+            showConfirm('Delete Style?', `Remove "${name}" from the catalog? This cannot be undone.`, () => {
+                remove(ref(db, `salon/styles/${id}`)).then(() => toast(`"${name}" removed.`, 'success'));
+            });
+        };
+
+        // ── GALLERY ─────────────────────────────────────
+        let galleryCount = 0;
+        onValue(ref(db, 'salon/gallery'), snap => {
+            const list = document.getElementById('gallery-list');
+            list.innerHTML = '';
+            galleryCount = 0;
+            if (!snap.exists()) {
+                list.innerHTML = '<div class="empty-state"><div class="empty-icon">🖼️</div>No images uploaded yet.</div>';
+                document.getElementById('gallery-count').textContent = '0 images';
+                document.getElementById('stat-gallery').textContent = '0';
+                return;
+            }
+            Object.entries(snap.val()).forEach(([id, item]) => {
+                galleryCount++;
+                const row = document.createElement('div');
+                row.className = 'data-row';
+                const short = item.imageUrl.length > 50 ? item.imageUrl.substring(0,50) + '…' : item.imageUrl;
+                row.innerHTML = `
+                    <div class="data-row-info"><h6>Portfolio Image #${galleryCount}</h6><p>${short}</p></div>
+                    <button class="icon-btn delete" title="Remove image" onclick="deleteGallery('${id}')">🗑️</button>
+                `;
+                list.appendChild(row);
+            });
+            document.getElementById('gallery-count').textContent = `${galleryCount} image${galleryCount !== 1 ? 's' : ''}`;
+            document.getElementById('stat-gallery').textContent = galleryCount;
+        });
+
+        window.addGalleryImage = function() {
+            const url = document.getElementById('g-url').value.trim();
+            if (!url) { toast('Please enter an image URL.', 'error'); return; }
+            push(ref(db, 'salon/gallery'), { imageUrl: url })
+                .then(() => { toast('Image added to gallery!', 'success'); document.getElementById('g-url').value = ''; })
+                .catch(() => toast('Failed to add image.', 'error'));
+        };
+
+        window.deleteGallery = function(id) {
+            showConfirm('Remove Image?', 'This image will be removed from the live gallery.', () => {
+                remove(ref(db, `salon/gallery/${id}`)).then(() => toast('Image removed.', 'success'));
+            });
+        };
+
+        // ── BOOKINGS ─────────────────────────────────────
+        let bookingsData = {};
+        onValue(ref(db, 'salon/bookings'), snap => {
+            bookingsData = snap.val() || {};
+            const tbody = document.getElementById('bookings-table');
+            tbody.innerHTML = '';
+            const count = snap.exists() ? Object.keys(bookingsData).length : 0;
+            document.getElementById('stat-bookings').textContent = count;
+
+            calculateLoyalty(bookingsData);
+
+            if (!snap.exists()) {
+                tbody.innerHTML = '<tr><td colspan="8" class="empty-state">No bookings yet. Grid is clean!</td></tr>';
+                return;
+            }
+
+            Object.entries(bookingsData).reverse().forEach(([id, b]) => {
+                const inbound = b.timestamp ? new Date(b.timestamp).toLocaleDateString('en-GB') + ' ' + new Date(b.timestamp).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'}) : '—';
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="slot-code">${inbound}</span></td>
+                    <td class="name-cell"><strong>${b.customerName}</strong><small>${b.customerEmail}</small></td>
+                    <td>${b.hairstyle}</td>
+                    <td><span class="badge badge-slate">${b.styleLength || 'Short'}</span></td>
+                    <td class="price-cell">${b.finalPrice || 'K0'}</td>
+                    <td>
+                        <span class="slot-code">📅 ${b.appointmentDate || '—'}</span><br>
+                        <span class="slot-code" style="margin-top:4px;display:inline-block">⏱ ${b.appointmentSlot || '—'}</span>
+                    </td>
+                    <td><div class="specs-cell">${b.userSpecifications || 'None.'}</div></td>
+                    <td><button class="icon-btn delete" onclick="deleteBooking('${id}')">🗑️</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        });
+
+        window.deleteBooking = function(id) {
+            showConfirm('Remove Booking?', 'This booking will be permanently deleted.', () => {
+                remove(ref(db, `salon/bookings/${id}`)).then(() => toast('Booking removed.', 'success'));
+            });
+        };
+
+        window.confirmClearAll = function() {
+            showConfirm('Clear ALL Bookings?', 'This will permanently delete every booking in the database. This cannot be undone.', () => {
+                remove(ref(db, 'salon/bookings')).then(() => toast('All bookings cleared.', 'success'));
+            });
+        };
+
+        // ── LOYALTY ──────────────────────────────────────
+        let resetsData = {};
+        onValue(ref(db, 'salon/loyaltyResets'), snap => { resetsData = snap.val() || {}; });
+
+        function calculateLoyalty(bookingsObj) {
+            if (!bookingsObj || Object.keys(bookingsObj).length === 0) {
+                document.getElementById('loyalty-table').innerHTML = '<tr><td colspan="6" class="empty-state">No booking history to analyse yet.</td></tr>';
+                return;
+            }
+            const clientGroups = {};
+            Object.values(bookingsObj).forEach(b => {
+                if (!b.customerEmail || b.customerEmail.includes('WhatsApp')) return;
+                const email = b.customerEmail.trim().toLowerCase();
+                if (!clientGroups[email]) clientGroups[email] = [];
+                if (b.appointmentDate) {
+                    const parts = b.appointmentDate.split('-');
+                    if (parts.length === 3) clientGroups[email].push({ year: parseInt(parts[0]), month: parseInt(parts[1]) });
+                }
+            });
+
+            const ranked = Object.keys(clientGroups).map(email => {
+                let keys = clientGroups[email].map(d => d.year * 12 + d.month);
+                keys = [...new Set(keys)].sort((a, b) => b - a);
+                let streak = 0;
+                if (keys.length > 0) {
+                    streak = 1;
+                    for (let i = 0; i < keys.length - 1; i++) {
+                        if (keys[i] - keys[i+1] === 1) streak++;
+                        else break;
+                    }
+                }
+                const offset = resetsData[btoa(email)] || 0;
+                return { email, streak: Math.max(0, streak - offset), total: keys.length };
+            }).sort((a, b) => b.streak - a.streak || b.total - a.total);
+
+            const tbody = document.getElementById('loyalty-table');
+            tbody.innerHTML = '';
+
+            if (ranked.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No email-verified bookings to track.</td></tr>';
+                return;
+            }
+
+            ranked.forEach((c, i) => {
+                const pos = i + 1;
+                const isEligible = pos <= 2 && c.streak >= 5;
+                const pct = Math.min(100, (c.streak / 5) * 100);
+                const statusHtml = isEligible
+                    ? `<span class="badge badge-yellow">🎁 30% Discount Earned</span>`
+                    : c.streak >= 3
+                        ? `<span class="badge badge-rose">🔥 ${5 - c.streak} months to go</span>`
+                        : `<span class="badge badge-slate">Building streak</span>`;
+                const actionHtml = isEligible
+                    ? `<button class="btn btn-success btn-sm" onclick="markAwarded('${c.email}', ${c.total})">Mark Awarded ✓</button>`
+                    : `<span style="color:var(--slate-400);font-size:0.75rem;">—</span>`;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><strong>${pos <= 2 ? '🥇'.repeat(pos === 1 ? 1 : 0) || '🥈' : '#' + pos}</strong></td>
+                    <td><code style="font-size:0.8rem;">${c.email}</code></td>
+                    <td>
+                        <div class="streak-bar-wrap">
+                            <div class="streak-bar"><div class="streak-bar-fill" style="width:${pct}%"></div></div>
+                            <span class="streak-num">${c.streak}/5</span>
+                        </div>
+                    </td>
+                    <td><span class="badge badge-slate">${c.total} mo.</span></td>
+                    <td>${statusHtml}</td>
+                    <td>${actionHtml}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        window.markAwarded = function(email, total) {
+            showConfirm('Confirm Award Issued?', `Confirm the 30% discount was given to ${email}. Their streak counter will reset.`, () => {
+                const key = btoa(email.trim().toLowerCase());
+                set(ref(db, `salon/loyaltyResets/${key}`), total)
+                    .then(() => toast(`Reward issued to ${email}. Streak reset.`, 'success'));
+            }, false);
+        };
+    </script>
+</body>
+</html>
