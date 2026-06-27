@@ -3,220 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Maria's Salon | Elite CMS Admin Panel</title>
-    <!-- Premium Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    
+    <title>Maria's Salon | Admin Dashboard</title>
     <style>
-        :root {
-            --primary: #db2777;
-            --primary-hover: #be185d;
-            --dark: #1e1b4b;
-            --light: #fdf2f8;
-            --slate: #f8fafc;
-            --success: #16a34a;
-        }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Inter', sans-serif; background-color: #f1f5f9; color: #334155; }
+        :root { --primary: #db2777; --dark: #0f172a; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, sans-serif; }
+        body { background-color: #f8fafc; color: #334155; padding: 30px; }
+        .wrapper { max-width: 1100px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        h1 { color: var(--dark); border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
+        .badge { background: #fce7f3; color: var(--primary); font-size: 0.8rem; padding: 4px 10px; border-radius: 20px; }
         
-        header { background: var(--dark); color: white; padding: 25px 20px; border-bottom: 4px solid var(--primary); display: flex; justify-content: space-between; align-items: center; }
-        header h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: #fbcfe8; }
-        header span { background: rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 20px; font-size: 0.85rem; letter-spacing: 0.5px; }
-
-        .admin-container { max-width: 1200px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-        @media(max-width: 900px) { .admin-container { grid-template-columns: 1fr; } }
-
-        .admin-card { background: white; padding: 30px; border-radius: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); border-top: 4px solid #cbd5e1; height: fit-content; }
-        .admin-card.accent { border-top-color: var(--primary); }
-        .admin-card h3 { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--dark); margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 30px; margin-top: 20px; }
+        .card { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 25px; box-shadow: 0 2px 4px rgba(0,0,0,0.01); }
         
-        label { display: block; font-weight: 500; font-size: 0.9rem; margin-bottom: 6px; color: #475569; }
-        input, select, textarea { width: 100%; padding: 10px 14px; margin-bottom: 16px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.95rem; background: var(--slate); font-family: inherit; }
+        label { display: block; font-weight: 600; margin-top: 20px; margin-bottom: 5px; color: var(--dark); }
+        select, textarea { width: 100%; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 1rem; background: #f8fafc; }
+        textarea { resize: vertical; }
+        .checkbox-container { display: flex; align-items: center; margin: 20px 0; background: #fff1f2; padding: 15px; border-radius: 6px; border: 1px solid #ffe4e6; }
+        .checkbox-container input { width: 20px; height: 20px; margin-right: 12px; cursor: pointer; }
+        .checkbox-container label { margin: 0; cursor: pointer; color: #9f1239; }
+        .btn { background: var(--primary); color: white; border: none; padding: 14px; width: 100%; border-radius: 6px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: background 0.2s; }
+        .btn:hover { background: #be185d; }
+        .alert { background: #dcfce7; color: #15803d; padding: 15px; border-radius: 6px; margin-bottom: 20px; font-weight: 500; display: none; }
         
-        .checkbox-wrapper { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; background: var(--light); padding: 10px; border-radius: 6px; border: 1px dashed #fbcfe8; }
-        .checkbox-wrapper input { width: auto; margin: 0; cursor: pointer; }
-        .checkbox-wrapper label { margin: 0; cursor: pointer; font-weight: 600; color: var(--primary); }
-
-        button.btn { background: var(--dark); color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: 600; width: 100%; font-size: 0.95rem; transition: background 0.2s; }
-        button.btn:hover { background: #2e2a78; }
-        button.btn.primary-btn { background: var(--primary); }
-        button.btn.primary-btn:hover { background: var(--primary-hover); }
-        button.btn.danger-btn { background: #ef4444; width: auto; padding: 8px 16px; font-size: 0.85rem; }
-        button.btn.danger-btn:hover { background: #dc2626; }
-        button.btn.success-btn { background: var(--success); width: auto; padding: 6px 12px; font-size: 0.8rem; border-radius: 4px; }
-        button.btn.success-btn:hover { background: #15803d; }
-
-        .data-list { max-height: 320px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 15px; background: var(--slate); }
-        .list-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid #e2e8f0; background: white; }
-        .list-item:last-child { border-bottom: none; }
-        .list-item-info h5 { font-weight: 600; color: var(--dark); }
-        .list-item-info p { font-size: 0.8rem; color: #64748b; }
-        .delete-icon { background: #ef4444; color: white; border: none; width: 28px; height: 28px; border-radius: 6px; cursor: pointer; font-weight: bold; display: flex; align-items: center; justify-content: center; }
-        .delete-icon:hover { background: #dc2626; }
-
-        .booking-feed { grid-column: 1 / -1; }
-        .feed-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .feed-header h3 { margin-bottom: 0; }
-        .booking-table-wrapper { overflow-x: auto; background: white; border-radius: 8px; border: 1px solid #e2e8f0; margin-top: 15px; }
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
-        th { background: #f8fafc; color: #475569; padding: 14px; border-bottom: 2px solid #e2e8f0; font-weight: 600; }
-        td { padding: 14px; border-bottom: 1px solid #e2e8f0; vertical-align: top; }
-        tr:last-child td { border-bottom: none; }
-        .specs-cell { font-size: 0.85rem; color: #475569; background: #f8fafc; padding: 8px; border-radius: 4px; max-width: 220px; word-wrap: break-word; }
-        .date-badge { display: block; font-size: 0.75rem; color: #64748b; margin-top: 4px; background: #e2e8f0; padding: 2px 6px; border-radius: 4px; width: fit-content; }
-        
-        /* Reward styling components */
-        .reward-badge { display: inline-block; background: #fef9c3; border: 1px solid #fde047; color: #a16207; padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 0.8rem; margin-top: 5px; animation: pulse 2s infinite; }
-        .streak-counter { font-weight: bold; color: var(--primary); background: var(--light); padding: 2px 6px; border-radius: 4px; }
-        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.7; } 100% { opacity: 1; } }
+        .reply-btn { display: inline-flex; align-items: center; gap: 6px; text-decoration: none; background: var(--dark); color: white; border: none; padding: 8px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: bold; cursor: pointer; margin-top: 10px; width: fit-content; transition: background 0.2s; }
+        .reply-btn:hover { background: #1e293b; }
     </style>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </head>
 <body>
 
-    <header>
-        <h1>💇‍♀️ Maria's Lookbook CMS Control Panel</h1>
-        <span>🔴 LIVE DATA SYNC ACTIVE</span>
-    </header>
-
-    <div class="admin-container">
+    <div class="wrapper">
+        <h1>Maria's Saloon Admin Panel <span class="badge">Live Controller</span></h1>
         
-        <!-- NEW FEATURE: LOYALTY AND FREQUENT BOOKING RANKINGS -->
-        <div class="admin-card accent" style="grid-column: 1 / -1;">
-            <h3>👑 Client Loyalty Hub & Streaks (Top 2 Monthly VIPs)</h3>
-            <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 15px;">
-                Ranks customers based on consecutive monthly bookings. If a client achieves a 5-month streak, they are flagged for a 30% discount award.
-            </p>
-            <div class="booking-table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Rank Position</th>
-                            <th>Customer Email</th>
-                            <th>Consecutive Months Booked</th>
-                            <th>Loyalty Status / Special Offers</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="loyalty-ranking-table">
-                        <tr>
-                            <td colspan="5" style="text-align:center; color:#94a3b8; padding:20px;">Processing customer database histories...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-        
-        <!-- MODULE 1: LANDING PAGE HERO MANAGER -->
-        <div class="admin-card accent">
-            <h3>🖼️ Homepage Banner & Cover Manager</h3>
-            <form id="hero-form" onsubmit="updateHeroBanner(event)">
-                <label>Main Headline text</label>
-                <input type="text" id="hero-headline-input" required placeholder="e.g., Flawless Plaits, Every Time">
-                
-                <label>Subtext Description / Promotion Announcement</label>
-                <textarea id="hero-subtext-input" required placeholder="e.g., Special Holiday Discount!"></textarea>
-                
-                <label>Cover Photo Image URL</label>
-                <input type="url" id="hero-image-input" required placeholder="Paste image link address">
-                
-                <button type="submit" class="btn primary-btn">Update Live Website Banner</button>
-            </form>
-        </div>
+        <div class="alert" id="success-message">Promotion successfully published!</div>
 
-        <!-- MODULE 2: MARIA'S TOUCH GALLERY UPLOADER -->
-        <div class="admin-card">
-            <h3>✨ 'Maria's Touch' Portfolio Gallery</h3>
-            <form onsubmit="uploadGalleryImage(event)">
-                <label>Paste Finished Masterpiece Image URL</label>
-                <input type="url" id="gallery-url-input" required placeholder="https://images.unsplash.com/your-photo-link">
-                <button type="submit" class="btn" style="margin-bottom:15px;">Add to Live Gallery</button>
-            </form>
+        <p style="color: #64748b;">Use this secure dashboard to update live marketing campaigns, instantly blast notifications, and view incoming bookings.</p>
+
+        <div class="grid">
             
-            <label>Current Live Gallery Stream (Click 🗑️ to delete)</label>
-            <div class="data-list" id="admin-gallery-list">
-                <p style="text-align:center; padding:20px; color:#94a3b8;">Loading portfolio assets...</p>
-            </div>
-        </div>
-
-        <!-- MODULE 3: STYLES CATALOG & PRICE CONFIGURATOR -->
-        <div class="admin-card accent" style="grid-column: 1 / -1;">
-            <h3>✂️ Style Catalog & Pricing Matrix</h3>
-            <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 30px;">
+            <div class="card">
+                <h3 style="color: var(--dark); border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; margin-bottom: 10px;">📣 Marketing Controls</h3>
                 
-                <form onsubmit="addHairstyle(event)">
-                    <label>Hairstyle Name</label>
-                    <input type="text" id="style-name" required placeholder="e.g., Goddess Knotless Braids">
-                    
-                    <label>Style Demo Image URL</label>
-                    <input type="url" id="style-image" required placeholder="Paste lookbook image URL address">
+                <label>1. Select Promotion Category</label>
+                <select id="category-picker" onchange="updateTemplates()">
+                    <option value="weekend">☀️ Weekend & Flash Sales</option>
+                    <option value="holidays">🎉 Major Holidays (Christmas, New Year, Easter, Independence Day)</option>
+                    <option value="seasonal">📚 Seasonal & Back to School</option>
+                </select>
 
-                    <div class="checkbox-wrapper">
-                        <input type="checkbox" id="style-short-only" onchange="toggleAdminLengthInputs(this.checked)">
-                        <label for="style-short-only">This style is "Short Length Only" (Constant Price)</label>
-                    </div>
+                <label>2. Choose a Smart Template Option</label>
+                <select id="template-picker" onchange="syncEditor()">
+                </select>
 
-                    <div id="admin-price-matrix-box">
-                        <label>Price for Short Length (K)</label>
-                        <input type="number" id="price-short" required placeholder="e.g., 200">
-                        
-                        <div id="extended-lengths-box">
-                            <label>Price for Medium Length (K)</label>
-                            <input type="number" id="price-medium" required value="0" placeholder="e.g., 250">
-                            
-                            <label>Price for Long Length (K)</label>
-                            <input type="number" id="price-long" required value="0" placeholder="e.g., 300">
-                        </div>
-                    </div>
+                <label>3. Customize Final Ad Message</label>
+                <textarea id="ad-editor" rows="5"></textarea>
 
-                    <button type="submit" class="btn primary-btn">Publish to Customer Catalog</button>
-                </form>
-
-                <div>
-                    <label style="font-weight:600; margin-bottom:10px;">Live Style Lookbook Catalog Feed</label>
-                    <div class="data-list" id="admin-catalog-list" style="max-height: 480px;">
-                        <p style="text-align:center; padding:20px; color:#94a3b8;">Loading style definitions...</p>
-                    </div>
+                <div class="checkbox-container">
+                    <input type="checkbox" id="email-blast" checked>
+                    <label for="email-blast"><strong>Notify Customers:</strong> Automatically send this message via business email to all subscribers.</label>
                 </div>
 
+                <button class="btn" onclick="handlePublish()">🚀 Push Updates Live</button>
             </div>
-        </div>
 
-        <!-- MODULE 4: REALTIME BOOKINGS FEED -->
-        <div class="admin-card booking-feed">
-            <div class="feed-header">
-                <h3>📋 Customer Booking Pipeline Feed (Max 3 Clients/Day)</h3>
-                <button class="btn danger-btn" onclick="clearAllBookings()">⚠️ Clear All Bookings</button>
+            <div class="card">
+                <h3 style="color: var(--dark); border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; margin-bottom: 10px;">📅 Incoming Email Bookings</h3>
+                <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 15px;">Clients listed below submitted scheduling data and requested manual verification via email.</p>
+                
+                <div id="bookings-list" style="max-height: 460px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 5px;">
+                    <p style="color: #94a3b8; font-style: italic; text-align: center; margin-top: 20px;">Checking database for incoming booking feeds...</p>
+                </div>
             </div>
-            <div class="booking-table-wrapper">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Inbound Date</th>
-                            <th>Client Name</th>
-                            <th>Hairstyle Choice</th>
-                            <th>Length Option</th>
-                            <th>Final Price</th>
-                            <th>Reserved Date & Slot</th>
-                            <th>Specifications / Questions</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="admin-bookings-table">
-                        <tr>
-                            <td colspan="8" style="text-align:center; color:#94a3b8; padding:30px;">Waiting for real-time customer data stream transmissions...</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
 
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getDatabase, ref, onValue, set, push, remove } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyA0vagMFgcrETgAOL7qY3FyKpK5ZIoScck",
@@ -227,250 +91,121 @@
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
 
-        // Track user award bypasses globally
-        let resetsData = {};
+        const chime = new Audio('https://assets.mixkit.co/active_storage/sfx/2869/2869-600.wav');
+        let initialLoadDone = false;
 
-        // Listen for reset tracking records
-        onValue(ref(database, 'salon/loyaltyResets'), (snapshot) => {
-            resetsData = snapshot.val() || {};
-        });
+        const templates = {
+            weekend: [
+                "☀️ Weekend Rush! Book any plaiting service for Friday or Saturday and get a free deep conditioning treatment!",
+                "✨ Mid-Week Glow Up: Book your lines or twists on Tuesday or Wednesday and save K50 on your overall total!",
+                "🔋 Sunday Special: Get your clean protective school or work lines done this Sunday evening. Limited spaces available."
+            ],
+            holidays: [
+                "🎄 Look stunning for the festive season! Holiday booking slots are officially open. Secure your braid slot early!",
+                "✨ New Year, New Hair! Start beautiful with 20% off all crisp knotless braids at Maria's Hair Saloon.",
+                "🇿🇲 Celebrate Independence Day in style! Enjoy a special flash discount on all signature styles this holiday weekend.",
+                "❤️ Love is in the hair! Book an appointment with a friend for Valentine's Day and receive matching hair gift accessories.",
+                "🐣 Easter Long Weekend Special! Get your hair looking fresh before the holiday travels. Book online now!"
+            ],
+            seasonal: [
+                "📚 Back to School, Back to Looking Sharp! Special neat and durable school lines for kids and teens at flat discount rates.",
+                "❄️ Cold Weather Hair Protection! Keep your hair thriving with beautiful protective twists and braids. Book your slot today!"
+            ]
+        };
 
-        // --- CORE LOGIC: CALCULATION ENGINE FOR STREAKS & RANKINGS ---
-        function calculateAndRenderLoyalty(bookingsObj) {
-            if (!bookingsObj) {
-                document.getElementById('loyalty-ranking-table').innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:20px;">No booking data history found to trace loyalty tracking.</td></tr>';
-                return;
-            }
-
-            const clientGroups = {};
+        window.updateTemplates = function() {
+            const category = document.getElementById('category-picker').value;
+            const picker = document.getElementById('template-picker');
+            picker.innerHTML = '';
             
-            // 1. Map client appointments by normalized unique identifiers
-            Object.values(bookingsObj).forEach(b => {
-                if (!b.customerEmail || b.customerEmail.includes("WhatsApp Option")) return;
-                const email = b.customerEmail.trim().toLowerCase();
-                if (!clientGroups[email]) clientGroups[email] = [];
-                
-                if (b.appointmentDate) {
-                    const dateParts = b.appointmentDate.split('-'); // YYYY-MM-DD
-                    if(dateParts.length === 3) {
-                        clientGroups[email].push({ year: parseInt(dateParts[0]), month: parseInt(dateParts[1]) });
-                    }
-                }
+            templates[category].forEach((msg) => {
+                let option = document.createElement('option');
+                option.value = msg;
+                option.innerText = msg.substring(0, 70) + "...";
+                picker.appendChild(option);
             });
+            syncEditor();
+        }
 
-            const rankedClients = [];
+        window.syncEditor = function() {
+            document.getElementById('ad-editor').value = document.getElementById('template-picker').value;
+        }
 
-            // 2. Loop clients to find consecutive unique months row streaks
-            Object.keys(clientGroups).forEach(email => {
-                const dates = clientGroups[email];
+        window.handlePublish = function() {
+            const bannerMsg = document.getElementById('ad-editor').value;
+            const isEmailChecked = document.getElementById('email-blast').checked;
+            const alertBox = document.getElementById('success-message');
+            
+            set(ref(database, 'salon/currentPromo'), bannerMsg)
+            .then(() => {
+                alertBox.style.display = "block";
                 
-                // Convert to unique month signatures: (Year * 12) + Month index
-                let monthKeys = dates.map(d => (d.year * 12) + d.month);
-                monthKeys = [...new Set(monthKeys)].sort((a, b) => b - a); // Sort newest to oldest
+                if (isEmailChecked) {
+                    alertBox.innerText = "🚀 Syncing updates and routing email broadcasts...";
+                    emailjs.init("YOUR_PUBLIC_KEY");
 
-                let currentStreak = 0;
-                if (monthKeys.length > 0) {
-                    currentStreak = 1;
-                    for (let i = 0; i < monthKeys.length - 1; i++) {
-                        if (monthKeys[i] - monthKeys[i+1] === 1) {
-                            currentStreak++;
-                        } else {
-                            break; // Streak broken
-                        }
-                    }
+                    const templateParams = {
+                        promo_message: bannerMsg
+                    };
+
+                    emailjs.send("service_fxq467c", "YOUR_TEMPLATE_ID", templateParams)
+                    .then(() => {
+                        alertBox.innerText = "🚀 Success! Live site updated & email broadcast sent to subscribers!";
+                    })
+                    .catch((err) => {
+                        alert("Email broadcast connection issue: " + JSON.stringify(err));
+                    });
+                } else {
+                    alertBox.innerText = "💻 Success! Live site updated globally.";
                 }
-
-                // Adjust streak based on Maria's manual start-over resets
-                const resetOffset = resetsData[btoa(email)] || 0;
-                let adjustedStreak = Math.max(0, currentStreak - resetOffset);
-
-                rankedClients.push({ email, streak: adjustedStreak, totalBookings: monthKeys.length });
-            });
-
-            // Order rankings descending by consecutive streak sizes
-            rankedClients.sort((a, b) => b.streak - a.streak || b.totalBookings - a.totalBookings);
-
-            const tbody = document.getElementById('loyalty-ranking-table');
-            tbody.innerHTML = '';
-
-            if (rankedClients.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; color:#94a3b8; padding:20px;">No verified email bookings available for tracking yet.</td></tr>';
-                return;
-            }
-
-            // 3. Render Top Clients with strict rules conditions
-            rankedClients.forEach((client, index) => {
-                const position = index + 1;
-                let rewardCellHtml = `<span style="color:#64748b; font-size:0.85rem;">Keep booking to trigger rewards</span>`;
-                let actionButtonHtml = `<em>Locked</em>`;
-
-                // Condition check: Client must be in top 2 positions AND hit a streak of at least 5 consecutive months
-                if (position <= 2 && client.streak >= 5) {
-                    rewardCellHtml = `<span class="reward-badge">🎁 Award for Top 2: 30% Discount Earned!</span>`;
-                    actionButtonHtml = `<button class="btn success-btn" onclick="applyAwardReset('${client.email}', ${client.totalBookings})">✓ Mark Awarded</button>`;
-                }
-
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td><strong>#${position}</strong></td>
-                    <td><code>${client.email}</code></td>
-                    <td><span class="streak-counter">${client.streak} months</span> consecutive</td>
-                    <td>${rewardCellHtml}</td>
-                    <td>${actionButtonHtml}</td>
-                `;
-                tbody.appendChild(tr);
+                setTimeout(() => { alertBox.style.display = "none"; }, 5000);
+            })
+            .catch((error) => {
+                alert('Database update failed: ' + error.message);
             });
         }
 
-        window.applyAwardReset = function(email, currentTotalUniqueMonths) {
-            if (confirm(`Confirm award issued to ${email}? This will register the 30% discount as complete and start their loyalty streak tracking counter back over.`)) {
-                // Encode email string safely to construct database reference paths keys
-                const secureKey = btoa(email.trim().toLowerCase());
-                set(ref(database, `salon/loyaltyResets/${secureKey}`), currentTotalUniqueMonths)
-                .then(() => alert("Client reward registered! Loyalty metric restarted successfully."));
-            }
-        }
-
-        // --- MODULE 1: HERO CONFIG ---
-        onValue(ref(database, 'salon/heroConfig'), (snapshot) => {
+        const bookingsRef = ref(database, 'salon/bookings');
+        onValue(bookingsRef, (snapshot) => {
+            const listContainer = document.getElementById('bookings-list');
+            listContainer.innerHTML = ''; 
+            
             const data = snapshot.val();
-            if(data) {
-                document.getElementById('hero-headline-input').value = data.headline || '';
-                document.getElementById('hero-subtext-input').value = data.subtext || '';
-                document.getElementById('hero-image-input').value = data.imageUrl || '';
-            }
-        });
+            if (data) {
+                if (initialLoadDone) {
+                    chime.play().catch(err => console.log("Audio play delayed: ", err));
+                }
 
-        window.updateHeroBanner = function(e) {
-            e.preventDefault();
-            const headline = document.getElementById('hero-headline-input').value;
-            const subtext = document.getElementById('hero-subtext-input').value;
-            const imageUrl = document.getElementById('hero-image-input').value;
-            set(ref(database, 'salon/heroConfig'), { headline, subtext, imageUrl })
-            .then(() => alert("🎉 Live Website Banner updated successfully!"));
-        }
+                Object.keys(data).reverse().forEach((key) => {
+                    const booking = data[key];
+                    const bookingCard = document.createElement('div');
+                    bookingCard.style.cssText = "background: #f8fafc; border-left: 4px solid #db2777; padding: 14px; border-radius: 6px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 4px; display: flex; flex-direction: column;";
+                    
+                    const subjectLine = encodeURIComponent(`Booking Request Received! - Maria's Hair Saloon`);
+                    const bodyLayout = encodeURIComponent(`Hello ${booking.customerName},\n\nThank you for choosing Maria's Hair Saloon! I received your website booking request for ${booking.hairstyle} on ${booking.appointmentTime}.\n\nYour slot is tentatively saved! I am ready to give you a clean, neat look. Please let me know if you have any style reference pictures you would like me to review before you arrive.\n\n`);
 
-        // --- MODULE 2: GALLERY ---
-        onValue(ref(database, 'salon/gallery'), (snapshot) => {
-            const container = document.getElementById('admin-gallery-list');
-            container.innerHTML = '';
-            if(snapshot.exists()) {
-                Object.entries(snapshot.val()).forEach(([id, item]) => {
-                    const row = document.createElement('div');
-                    row.className = 'list-item';
-                    row.innerHTML = `
-                        <div class="list-item-info"><h5>Portfolio Asset</h5><p>${item.imageUrl}</p></div>
-                        <button class="delete-icon" onclick="deleteGalleryAsset('${id}')">🗑️</button>
+                    bookingCard.innerHTML = `
+                        <strong style="color: #0f172a; font-size: 1.05rem; display:block; margin-bottom:4px;">${booking.customerName}</strong>
+                        <span style="color: #db2777; font-weight: 600; font-size: 0.9rem; display:block; margin-bottom:2px;">💇‍♀️ ${booking.hairstyle}</span>
+                        <span style="color: #64748b; font-size: 0.85rem; display:block;">📅 ${booking.appointmentTime}</span>
+                        ${booking.customerEmail ? `
+                            <span style="color: #475569; font-size: 0.85rem; display:block; margin-top:4px; font-style: italic;">✉️ ${booking.customerEmail}</span>
+                            <a href="mailto:${booking.customerEmail}?subject=${subjectLine}&body=${bodyLayout}" class="reply-btn">
+                                📩 Reply to Confirmation
+                            </a>
+                        ` : ''}
                     `;
-                    container.appendChild(row);
+                    listContainer.appendChild(bookingCard);
                 });
+                initialLoadDone = true;
             } else {
-                container.innerHTML = '<p style="text-align:center; padding:20px; color:#94a3b8;">No gallery entries.</p>';
+                listContainer.innerHTML = `<p style="color: #94a3b8; font-style: italic; text-align: center; margin-top: 20px;">No email bookings pending at the moment...</p>`;
+                initialLoadDone = true;
             }
         });
 
-        window.uploadGalleryImage = function(e) {
-            e.preventDefault();
-            const imageUrl = document.getElementById('gallery-url-input').value;
-            push(ref(database, 'salon/gallery'), { imageUrl }).then(() => {
-                document.getElementById('gallery-url-input').value = '';
-            });
-        }
-
-        window.deleteGalleryAsset = function(id) {
-            if(confirm("Remove this photo?")) remove(ref(database, `salon/gallery/${id}`));
-        }
-
-        // --- MODULE 3: STYLES LOOKBOOK ---
-        window.toggleAdminLengthInputs = function(isShortOnly) {
-            const extendedBox = document.getElementById('extended-lengths-box');
-            extendedBox.style.display = isShortOnly ? 'none' : 'block';
-            document.getElementById('price-medium').required = !isShortOnly;
-            document.getElementById('price-long').required = !isShortOnly;
-        }
-
-        window.addHairstyle = function(e) {
-            e.preventDefault();
-            const name = document.getElementById('style-name').value;
-            const imageUrl = document.getElementById('style-image').value;
-            const isShortOnly = document.getElementById('style-short-only').checked;
-            const priceShort = document.getElementById('price-short').value;
-            const priceMedium = isShortOnly ? "0" : document.getElementById('price-medium').value;
-            const priceLong = isShortOnly ? "0" : document.getElementById('price-long').value;
-
-            push(ref(database, 'salon/styles'), {
-                name, imageUrl, isShortOnly, priceShort, priceMedium, priceLong
-            }).then(() => {
-                e.target.reset();
-                toggleAdminLengthInputs(false);
-            });
-        }
-
-        onValue(ref(database, 'salon/styles'), (snapshot) => {
-            const container = document.getElementById('admin-catalog-list');
-            container.innerHTML = '';
-            if(snapshot.exists()) {
-                Object.entries(snapshot.val()).forEach(([id, item]) => {
-                    const row = document.createElement('div');
-                    row.className = 'list-item';
-                    let labelText = `K${item.priceShort} (Constant Short)`;
-                    if(!item.isShortOnly) labelText = `S: K${item.priceShort} | M: K${item.priceMedium} | L: K${item.priceLong}`;
-                    row.innerHTML = `
-                        <div class="list-item-info"><h5>${item.name}</h5><p>${labelText}</p></div>
-                        <button class="delete-icon" onclick="deleteCatalogStyle('${id}')">🗑️</button>
-                    `;
-                    container.appendChild(row);
-                });
-            } else {
-                container.innerHTML = '<p style="text-align:center; padding:20px; color:#94a3b8;">Lookbook empty.</p>';
-            }
-        });
-
-        window.deleteCatalogStyle = function(id) {
-            if(confirm("Delete this style profile?")) remove(ref(database, `salon/styles/${id}`));
-        }
-
-        // --- MODULE 4: LIVE RECEPTION & PIPELINE FEED ---
-        onValue(ref(database, 'salon/bookings'), (snapshot) => {
-            const tbody = document.getElementById('admin-bookings-table');
-            tbody.innerHTML = '';
-            
-            // Trigger calculation loops for the Loyalty Tracker module whenever bookings data updates
-            calculateAndRenderLoyalty(snapshot.val());
-
-            if(snapshot.exists()) {
-                const dataArray = Object.entries(snapshot.val()).reverse();
-                dataArray.forEach(([id, b]) => {
-                    let rawTimestamp = b.timestamp ? new Date(b.timestamp) : new Date();
-                    let formattedInboundDate = rawTimestamp.toLocaleDateString('en-GB') + ' @ ' + rawTimestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td><span class="date-badge">📥 ${formattedInboundDate}</span></td>
-                        <td><strong>${b.customerName}</strong><br><small style="color:#64748b">${b.customerEmail}</small></td>
-                        <td>${b.hairstyle}</td>
-                        <td>${b.styleLength || 'Short Variation'}</td>
-                        <td style="color:var(--primary); font-weight:600">${b.finalPrice || 'K0.00'}</td>
-                        <td>📅 <code>${b.appointmentDate}</code><br><small style="background:#e2e8f0; padding:2px 4px; border-radius:4px; font-weight:500;">⏱️ Slot: ${b.appointmentSlot}</small></td>
-                        <td><div class="specs-cell">${b.userSpecifications || 'None.'}</div></td>
-                        <td><button class="delete-icon" onclick="deleteSingleBooking('${id}')">🗑️</button></td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            } else {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:#94a3b8; padding:30px;">No appointments currently booked. Grid is clean!</td></tr>';
-            }
-        });
-
-        window.deleteSingleBooking = function(id) {
-            if(confirm("Remove booking from pipeline feed?")) remove(ref(database, `salon/bookings/${id}`));
-        }
-
-        window.clearAllBookings = function() {
-            if(confirm("🚨 RESET PIPELINE: Delete ALL bookings from the database?")) {
-                remove(ref(database, 'salon/bookings'));
-            }
-        }
+        // Initialize layout on start
+        window.updateTemplates();
     </script>
 </body>
 </html>
