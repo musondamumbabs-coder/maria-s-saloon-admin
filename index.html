@@ -53,62 +53,82 @@
         <button class="btn" onclick="handlePublish()">🚀 Push Updates Live</button>
     </div>
 
-    <script>
-        // Pre-designed template bank text options
-        const templates = {
-            weekend: [
-                "☀️ Weekend Rush! Book any plaiting service for Friday or Saturday and get a free deep conditioning treatment!",
-                "✨ Mid-Week Glow Up: Book your lines or twists on Tuesday or Wednesday and save K50 on your overall total!",
-                "🔋 Sunday Special: Get your clean protective school or work lines done this Sunday evening. Limited spaces available."
-            ],
-            holidays: [
-                "🎄 Look stunning for the festive season! Holiday booking slots are officially open. Secure your braid slot early!",
-                "✨ New Year, New Hair! Start 2026 beautifully with 20% off all crisp knotless braids at Maria's Hair Saloon.",
-                "🇿🇲 Celebrate Independence Day in style! Enjoy a special flash discount on all signature styles this holiday weekend.",
-                "❤️ Love is in the hair! Book an appointment with a friend for Valentine's Day and receive matching hair gift accessories.",
-                "🐣 Easter Long Weekend Special! Get your hair looking fresh before the holiday travels. Book online now!"
-            ],
-            seasonal: [
-                "📚 Back to School, Back to Looking Sharp! Special neat and durable school lines for kids and teens at flat discount rates.",
-                "❄️ Cold Weather Hair Protection! Keep your hair thriving with beautiful protective twists and braids. Book your slot today!"
-            ]
-        };
+    <script type="module">
+    // 1. Import Firebase Libraries
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-        function updateTemplates() {
-            const category = document.getElementById('category-picker').value;
-            const picker = document.getElementById('template-picker');
-            picker.innerHTML = '';
-            
-            templates[category].forEach((msg) => {
-                let option = document.createElement('option');
-                option.value = msg;
-                option.innerText = msg.substring(0, 70) + "...";
-                picker.appendChild(option);
-            });
-            syncEditor();
-        }
+    // 2. YOUR FIREBASE CONFIGURATION (Replace the values below with YOUR actual keys from your screen!)
+    const firebaseConfig = {
+        apiKey: "AIzaSyA0vagMFgcrETgAOL7qY3FyKpK5ZIoScck",
+        authDomain: "maria-s-hair-salon.firebaseapp.com",
+        databaseURL: "https://maria-s-hair-salon-default-rtdb.firebaseio.com"
+    };
 
-        function syncEditor() {
-            document.getElementById('ad-editor').value = document.getElementById('template-picker').value;
-        }
+    // Initialize Firebase
+    const app = initializeApp(firebaseConfig);
+    const database = getDatabase(app);
 
-        function handlePublish() {
-            const isEmailChecked = document.getElementById('email-blast').checked;
-            const bannerMsg = document.getElementById('ad-editor').value;
-            const alertBox = document.getElementById('success-message');
-            
+    // Pre-designed template bank text options
+    const templates = {
+        weekend: [
+            "☀️ Weekend Rush! Book any plaiting service for Friday or Saturday and get a free deep conditioning treatment!",
+            "✨ Mid-Week Glow Up: Book your lines or twists on Tuesday or Wednesday and save K50 on your overall total!",
+            "🔋 Sunday Special: Get your clean protective school or work lines done this Sunday evening. Limited spaces available."
+        ],
+        holidays: [
+            "🎄 Look stunning for the festive season! Holiday booking slots are officially open. Secure your braid slot early!",
+            "✨ New Year, New Hair! Start 2026 beautifully with 20% off all crisp knotless braids at Maria's Hair Saloon.",
+            "🇿🇲 Celebrate Independence Day in style! Enjoy a special flash discount on all signature styles this holiday weekend.",
+            "❤️ Love is in the hair! Book an appointment with a friend for Valentine's Day and receive matching hair gift accessories.",
+            "🐣 Easter Long Weekend Special! Get your hair looking fresh before the holiday travels. Book online now!"
+        ],
+        seasonal: [
+            "📚 Back to School, Back to Looking Sharp! Special neat and durable school lines for kids and teens at flat discount rates.",
+            "❄️ Cold Weather Hair Protection! Keep your hair thriving with beautiful protective twists and braids. Book your slot today!"
+        ]
+    };
+
+    window.updateTemplates = function() {
+        const category = document.getElementById('category-picker').value;
+        const picker = document.getElementById('template-picker');
+        picker.innerHTML = '';
+        
+        templates[category].forEach((msg) => {
+            let option = document.createElement('option');
+            option.value = msg;
+            option.innerText = msg.substring(0, 70) + "...";
+            picker.appendChild(option);
+        });
+        syncEditor();
+    }
+
+    window.syncEditor = function() {
+        document.getElementById('ad-editor').value = document.getElementById('template-picker').value;
+    }
+
+    // Push live to database
+    window.handlePublish = function() {
+        const bannerMsg = document.getElementById('ad-editor').value;
+        const isEmailChecked = document.getElementById('email-blast').checked;
+        const alertBox = document.getElementById('success-message');
+        
+        // Save live promo text to Firebase Realtime Database
+        set(ref(database, 'salon/currentPromo'), bannerMsg)
+        .then(() => {
             alertBox.style.display = "block";
             if (isEmailChecked) {
                 alertBox.innerText = "🚀 Success! Live site updated & email broadcast initiated.";
             } else {
-                alertBox.innerText = "💻 Success! Live site updated locally.";
+                alertBox.innerText = "💻 Success! Live site updated globally.";
             }
-
             setTimeout(() => { alertBox.style.display = "none"; }, 4000);
-        }
+        })
+        .catch((error) => {
+            alert('Database update failed: ' + error.message);
+        });
+    }
 
-        // Initialize template choices on page startup
-        window.onload = updateTemplates;
-    </script>
-</body>
-</html>
+    // Initialize layout on start
+    window.updateTemplates();
+</script>
